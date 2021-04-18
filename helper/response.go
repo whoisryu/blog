@@ -50,3 +50,14 @@ func ResponseNotFound() model.Response {
 
 	return response
 }
+
+func ResponseUnauthorized() model.Response {
+	response := model.Response{
+		Code:   401,
+		Status: "Unauthorized",
+		Data:   struct{}{},
+		Error:  model.GeneralError{General: "UNAUTORIZED"},
+	}
+
+	return response
+}

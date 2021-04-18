@@ -21,6 +21,7 @@ func (controller *UserController) Route(app fiber.Router) {
 	userRoute := app.Group("/user")
 
 	userRoute.Post("/register", controller.RegisterUser)
+	userRoute.Post("/login", controller.Login)
 }
 
 func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
@@ -45,4 +46,24 @@ func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusCreated).JSON(helper.ResponseSuccess(newUser))
+}
+
+func (controller UserController) Login(c *fiber.Ctx) error {
+	user := new(model.LoginRequest)
+
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
+	}
+
+	token, err := controller.UserService.Login(*user)
+
+	if err != nil && err.Error() == "404" {
+		return c.Status(http.StatusNotFound).JSON(helper.ResponseNotFound())
+	}
+
+	if err != nil && err.Error() == "401" {
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
+
+	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(token))
 }

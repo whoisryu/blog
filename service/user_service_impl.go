@@ -20,12 +20,12 @@ func NewUserService(userRepo *repository.UserRepo) UserService {
 
 func (service userServiceImpl) RegisterUser(req model.RegisterUserRequest) (*model.TokenResponse, error) {
 
-	checkUser, _ := service.UserRepo.GetUserByPhone(req.Phone)
+	checkUser := service.UserRepo.GetUserByPhone(req.Phone)
 	if checkUser.ID != 0 {
 		return nil, errors.New("phone registered")
 	}
 
-	checkUser, _ = service.UserRepo.GetUserByEmail(req.Email)
+	checkUser = service.UserRepo.GetUserByEmail(req.Email)
 	if checkUser.ID != 0 {
 		return nil, errors.New("email registered")
 	}
@@ -65,4 +65,35 @@ func (service userServiceImpl) RegisterUser(req model.RegisterUserRequest) (*mod
 		RefreshToken: ts.RefreshToken,
 	}
 	return &tokens, nil
+}
+
+func (service userServiceImpl) Login(req model.LoginRequest) (*model.TokenResponse, error) {
+	user := service.UserRepo.GetUserByEmail(req.Email)
+
+	if user.ID == 0 {
+		return nil, errors.New("404")
+	}
+
+	isValid := helper.ComparePasswords(user.PasswordHash, []byte(req.Password))
+
+	if isValid {
+		payloadToken := model.JwtPayload{
+			UserID:   strconv.Itoa(int(user.ID)),
+			UserName: user.UserName,
+		}
+		token, err := helper.CreateToken(payloadToken)
+		if err != nil {
+			return nil, err
+		}
+
+		tokenResp := model.TokenResponse{
+			AccessToken:  token.AccessToken,
+			RefreshToken: token.RefreshToken,
+		}
+
+		return &tokenResp, nil
+	}
+
+	return nil, errors.New("401")
+
 }

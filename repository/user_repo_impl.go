@@ -25,15 +25,15 @@ func (repo userRepoImpl) CreateUser(user entity.User) (entity.User, error) {
 	return user, nil
 }
 
-func (repo userRepoImpl) GetUserByPhone(phone string) (user entity.User, err error) {
-	err = repo.db.Where("phone = ?", phone).Find(&user).Error
+func (repo userRepoImpl) GetUserByPhone(phone string) (user entity.User) {
+	err := repo.db.Where("phone = ?", phone).Find(&user).Error
 	exception.PanicIfNeeded(err)
-	return user, err
+	return user
 }
 
-func (repo userRepoImpl) GetUserByEmail(email string) (user entity.User, err error) {
-	err = repo.db.Where("email = ?", email).Find(&user).Error
+func (repo userRepoImpl) GetUserByEmail(email string) (user entity.User) {
+	err := repo.db.Where("email = ?", email).Find(&user).Error
 
 	exception.PanicIfNeeded(err)
-	return user, nil
+	return user
 }

@@ -6,4 +6,5 @@ import (
 
 type UserService interface {
 	RegisterUser(req model.RegisterUserRequest) (*model.TokenResponse, error)
+	Login(req model.LoginRequest) (*model.TokenResponse, error)
 }
