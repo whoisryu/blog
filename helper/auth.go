@@ -129,7 +129,7 @@ func ExtractTokenMetadata(r *fiber.Ctx) (*model.AccessDetails, error) {
 		if !ok {
 			return nil, err
 		}
-		userId, err := strconv.ParseUint(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
+		userId, err := strconv.ParseUint(fmt.Sprintf("%v", claims["user_id"]), 10, 64)
 		if err != nil {
 			return nil, err
 		}

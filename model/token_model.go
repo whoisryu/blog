@@ -19,6 +19,10 @@ type TokenResponse struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 type AccessDetails struct {
 	AccessUuid string
 	UserId     uint64

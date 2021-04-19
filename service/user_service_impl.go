@@ -86,6 +86,11 @@ func (service userServiceImpl) Login(req model.LoginRequest) (*model.TokenRespon
 			return nil, err
 		}
 
+		saveErr := helper.CreateAuth(int64(user.ID), token)
+		if saveErr != nil {
+			return nil, saveErr
+		}
+
 		tokenResp := model.TokenResponse{
 			AccessToken:  token.AccessToken,
 			RefreshToken: token.RefreshToken,

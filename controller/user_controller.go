@@ -4,8 +4,12 @@ import (
 	"blog/helper"
 	"blog/model"
 	"blog/service"
+	"fmt"
 	"net/http"
+	"os"
+	"strconv"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -18,10 +22,11 @@ func NewUserController(userService *service.UserService) UserController {
 }
 
 func (controller *UserController) Route(app fiber.Router) {
+	app.Post("/token/refresh", controller.RefreshToken)
 	userRoute := app.Group("/user")
-
 	userRoute.Post("/register", controller.RegisterUser)
 	userRoute.Post("/login", controller.Login)
+	userRoute.Post("/logout", controller.Logout)
 }
 
 func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
@@ -66,4 +71,87 @@ func (controller UserController) Login(c *fiber.Ctx) error {
 	}
 
 	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(token))
+}
+
+func (controller UserController) Logout(c *fiber.Ctx) error {
+	au, err := helper.ExtractTokenMetadata(c)
+	if err != nil {
+		fmt.Println(err)
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
+
+	deleted, delErr := helper.DeleteAuth(au.AccessUuid)
+	if delErr != nil && deleted == 0 {
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
+
+	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(struct{}{}))
+}
+
+func (controller UserController) RefreshToken(c *fiber.Ctx) error {
+	req := new(model.RefreshTokenRequest)
+
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
+	}
+
+	token, err := jwt.Parse(req.RefreshToken, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return []byte(os.Getenv("REFRESH_SECRET")), nil
+	})
+
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
+
+	if _, ok := token.Claims.(jwt.Claims); !ok && !token.Valid {
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+
+	if ok && token.Valid {
+		refreshUuid, ok := claims["refresh_uuid"].(string)
+		if !ok {
+			return c.Status(http.StatusUnprocessableEntity).Send([]byte(err.Error()))
+		}
+
+		userId, err := strconv.ParseUint(fmt.Sprintf("%v", claims["user_id"]), 10, 64)
+		userName := fmt.Sprintf("%v", claims["username"])
+		if err != nil {
+			return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError("ERROR OCCURED"))
+		}
+
+		deleted, delErr := helper.DeleteAuth(refreshUuid)
+		if delErr != nil && deleted == 0 {
+			return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+		}
+
+		payloadToken := model.JwtPayload{
+			UserID:   strconv.Itoa(int(userId)),
+			UserName: userName,
+		}
+
+		ts, createErr := helper.CreateToken(payloadToken)
+		if createErr != nil {
+			return c.Status(http.StatusForbidden).JSON(createErr.Error())
+		}
+
+		saveErr := helper.CreateAuth(int64(userId), ts)
+		if saveErr != nil {
+			return c.Status(http.StatusForbidden).JSON(saveErr.Error())
+		}
+
+		response := model.TokenResponse{
+			AccessToken:  ts.AccessToken,
+			RefreshToken: ts.RefreshToken,
+		}
+
+		return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(response))
+
+	} else {
+		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
+	}
 }
