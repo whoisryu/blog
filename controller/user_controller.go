@@ -2,6 +2,7 @@ package controller
 
 import (
 	"blog/helper"
+	"blog/middleware"
 	"blog/model"
 	"blog/service"
 	"fmt"
@@ -26,7 +27,7 @@ func (controller *UserController) Route(app fiber.Router) {
 	userRoute := app.Group("/user")
 	userRoute.Post("/register", controller.RegisterUser)
 	userRoute.Post("/login", controller.Login)
-	userRoute.Post("/logout", controller.Logout)
+	userRoute.Post("/logout", middleware.TokenAuth(), controller.Logout)
 }
 
 func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
@@ -59,9 +60,7 @@ func (controller UserController) Login(c *fiber.Ctx) error {
 	if err := c.BodyParser(&user); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
 	}
-
 	token, err := controller.UserService.Login(*user)
-
 	if err != nil && err.Error() == "404" {
 		return c.Status(http.StatusNotFound).JSON(helper.ResponseNotFound())
 	}
