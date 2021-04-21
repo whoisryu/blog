@@ -15,14 +15,12 @@ func NewUserRepo(db *gorm.DB) UserRepo {
 	return &userRepoImpl{db: db}
 }
 
-func (repo userRepoImpl) CreateUser(user entity.User) (entity.User, error) {
+func (repo userRepoImpl) CreateUser(user entity.User) entity.User {
 	err := repo.db.Create(&user).Error
 
-	if err != nil {
-		return user, err
-	}
+	exception.PanicIfNeeded(err)
 
-	return user, nil
+	return user
 }
 
 func (repo userRepoImpl) GetUserByPhone(phone string) (user entity.User) {
@@ -35,5 +33,19 @@ func (repo userRepoImpl) GetUserByEmail(email string) (user entity.User) {
 	err := repo.db.Where("email = ?", email).Find(&user).Error
 
 	exception.PanicIfNeeded(err)
+	return user
+}
+
+func (repo userRepoImpl) GetUserByID(user entity.User) entity.User {
+	err := repo.db.First(&user).Error
+	exception.PanicIfNeeded(err)
+
+	return user
+}
+
+func (repo userRepoImpl) UpdateUser(user entity.User) entity.User {
+	err := repo.db.Updates(&user).Error
+	exception.PanicIfNeeded(err)
+
 	return user
 }

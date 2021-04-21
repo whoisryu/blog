@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"blog/exception"
 	"blog/helper"
 	"blog/middleware"
 	"blog/model"
@@ -28,6 +29,7 @@ func (controller *UserController) Route(app fiber.Router) {
 	userRoute.Post("/register", controller.RegisterUser)
 	userRoute.Post("/login", controller.Login)
 	userRoute.Post("/logout", middleware.TokenAuth(), controller.Logout)
+	userRoute.Put("/", middleware.TokenAuth(), controller.UpdateProfile)
 }
 
 func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
@@ -47,11 +49,32 @@ func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(helper.ResponseBadRequest(map[string]interface{}{"email": "REGISTERED"}))
 	}
 
-	if err != nil {
+	return c.Status(http.StatusCreated).JSON(helper.ResponseSuccess(newUser))
+}
+
+func (controller UserController) UpdateProfile(c *fiber.Ctx) error {
+	au, err := helper.ExtractTokenMetadata(c)
+	exception.PanicIfNeeded(err)
+
+	userID := strconv.Itoa(int(au.UserId))
+
+	user := new(model.UpdateProfileRequest)
+	user.ID = userID
+	if err := c.BodyParser(&user); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
 	}
 
-	return c.Status(http.StatusCreated).JSON(helper.ResponseSuccess(newUser))
+	newUser, err := controller.UserService.UpdateProfile(*user)
+
+	if err != nil && err.Error() == "phone registered" {
+		return c.Status(http.StatusBadRequest).JSON(helper.ResponseBadRequest(map[string]interface{}{"phone": "REGISTERED"}))
+	}
+
+	if err != nil && err.Error() == "email registered" {
+		return c.Status(http.StatusBadRequest).JSON(helper.ResponseBadRequest(map[string]interface{}{"email": "REGISTERED"}))
+	}
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(newUser))
 }
 
 func (controller UserController) Login(c *fiber.Ctx) error {

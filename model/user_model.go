@@ -12,3 +12,10 @@ type LoginRequest struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
+
+type UpdateProfileRequest struct {
+	ID      string
+	Phone   string `json:"phone"`
+	Email   string `json:"email"`
+	Profile string `json:"profile"`
+}
