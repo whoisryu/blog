@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 func ErrorHandler(ctx *fiber.Ctx, err error) error {
@@ -18,6 +19,15 @@ func ErrorHandler(ctx *fiber.Ctx, err error) error {
 			Status: "BAD_REQUEST",
 			Data:   struct{}{},
 			Error:  obj,
+		})
+	}
+
+	if err == gorm.ErrRecordNotFound {
+		return ctx.Status(404).JSON(model.Response{
+			Code:   404,
+			Status: "NOT_FOUND",
+			Data:   struct{}{},
+			Error:  struct{}{},
 		})
 	}
 

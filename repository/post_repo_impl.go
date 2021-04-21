@@ -50,6 +50,14 @@ func (repo postRepoImpl) CreatePost(post entity.Post) entity.Post {
 	return post
 }
 
+func (repo postRepoImpl) PostByID(ID uint) (post entity.Post) {
+	err := repo.db.Where("id=?", ID).First(&post).Error
+
+	exception.PanicIfNeeded(err)
+
+	return post
+}
+
 func (repo postRepoImpl) UpdatePost(post entity.Post) entity.Post {
 	err := repo.db.Updates(&post).Error
 	exception.PanicIfNeeded(err)

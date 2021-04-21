@@ -1,9 +1,14 @@
 package service
 
-import "blog/model"
+import (
+	"blog/entity"
+	"blog/model"
+)
 
 type PostService interface {
 	ListPost(req model.ListPostRequest) (response []model.ListPostResponse)
 	PostBySlug(slug string) (response model.ListPostResponse)
-	CreatePost(req model.CreatePostRequest)
+	CreatePost(req model.CreatePostRequest) entity.Post
+	UpdatePost(req model.UpdatePostRequest) entity.Post
+	DeletePost(ID string) 
 }

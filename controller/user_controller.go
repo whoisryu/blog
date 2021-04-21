@@ -69,7 +69,7 @@ func (controller UserController) Login(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
 	}
 
-	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(token))
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(token))
 }
 
 func (controller UserController) Logout(c *fiber.Ctx) error {
@@ -84,7 +84,7 @@ func (controller UserController) Logout(c *fiber.Ctx) error {
 		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())
 	}
 
-	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(struct{}{}))
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(struct{}{}))
 }
 
 func (controller UserController) RefreshToken(c *fiber.Ctx) error {
@@ -148,7 +148,7 @@ func (controller UserController) RefreshToken(c *fiber.Ctx) error {
 			RefreshToken: ts.RefreshToken,
 		}
 
-		return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(response))
+		return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
 
 	} else {
 		return c.Status(http.StatusUnauthorized).JSON(helper.ResponseUnauthorized())

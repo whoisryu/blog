@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"blog/exception"
 	"blog/helper"
 	"blog/model"
 	"blog/service"
@@ -23,6 +24,9 @@ func (controller *PostController) Route(app fiber.Router) {
 
 	postRoute.Get("/list", controller.ListPost)
 	postRoute.Get("/list/:slug", controller.PostBySlug)
+	postRoute.Post("/", controller.CreatePost)
+	postRoute.Put("/:id", controller.UpdatePost)
+	postRoute.Delete(":id", controller.DeletePost)
 }
 
 func (controller *PostController) ListPost(c *fiber.Ctx) error {
@@ -42,7 +46,7 @@ func (controller *PostController) ListPost(c *fiber.Ctx) error {
 
 	response := controller.PostService.ListPost(payload)
 
-	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(response))
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
 }
 
 func (controller *PostController) PostBySlug(c *fiber.Ctx) error {
@@ -54,6 +58,47 @@ func (controller *PostController) PostBySlug(c *fiber.Ctx) error {
 		return c.Status(http.StatusNotFound).JSON(helper.ResponseNotFound())
 	}
 
-	return c.Status(http.StatusAccepted).JSON(helper.ResponseSuccess(response))
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
 
+}
+
+func (controller *PostController) CreatePost(c *fiber.Ctx) error {
+	au, err := helper.ExtractTokenMetadata(c)
+	exception.PanicIfNeeded(err)
+
+	post := new(model.CreatePostRequest)
+
+	post.AuthorId = uint(au.UserId)
+
+	if err := c.BodyParser(&post); err != nil {
+		exception.PanicIfNeeded(err)
+	}
+
+	newPost := controller.PostService.CreatePost(*post)
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(newPost))
+}
+
+func (controller *PostController) UpdatePost(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	post := new(model.UpdatePostRequest)
+
+	post.ID = id
+
+	if err := c.BodyParser(&post); err != nil {
+		exception.PanicIfNeeded(err)
+	}
+
+	updatedPost := controller.PostService.UpdatePost(*post)
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(updatedPost))
+}
+
+func (controller *PostController) DeletePost(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	controller.PostService.DeletePost(id)
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(struct{}{}))
 }

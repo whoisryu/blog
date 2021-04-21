@@ -22,14 +22,17 @@ func main() {
 	//REPOSITORY
 	userRepo := repository.NewUserRepo(db)
 	postRepo := repository.NewPostRepo(db)
+	categoryRepo := repository.NewCategoryRepo(db)
 
 	//SERVICE
 	userService := service.NewUserService(&userRepo)
 	postService := service.NewPostService(&postRepo)
+	categoryService := service.NewCategoryService(&categoryRepo)
 
 	//CONTROLLER
 	userController := controller.NewUserController(&userService)
 	postController := controller.NewPostController(&postService)
+	categoryController := controller.NewCategoryController(&categoryService)
 
 	app := fiber.New(config.NewFiberConfig())
 	app.Use(recover.New())
@@ -39,6 +42,7 @@ func main() {
 	//ROUTE
 	userController.Route(v1)
 	postController.Route(v1)
+	categoryController.Route(v1)
 
 	err = app.Listen(":3000")
 	exception.PanicIfNeeded(err)

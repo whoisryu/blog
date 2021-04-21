@@ -19,6 +19,19 @@ type CreatePostRequest struct {
 	Title       string `json:"title"`
 	IsPublished bool   `json:"is_published"`
 	Content     string `json:"content"`
+	Categories  []uint `json:"categories"`
+	AuthorId    uint
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	PublishedAt time.Time
+}
+
+type UpdatePostRequest struct {
+	ID          string
+	Title       string `json:"title"`
+	IsPublished bool   `json:"is_published"`
+	Content     string `json:"content"`
+	Categories  []uint `json:"categories"`
 	AuthorId    uint
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
