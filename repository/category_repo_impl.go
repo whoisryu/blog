@@ -28,3 +28,10 @@ func (repo categoryRepoImpl) FindByID(ID uint) (category entity.Category) {
 
 	return category
 }
+
+func (repo categoryRepoImpl) CreateCategory(category entity.Category) entity.Category {
+	err := repo.db.Create(&category).Error
+	exception.PanicIfNeeded(err)
+
+	return category
+}

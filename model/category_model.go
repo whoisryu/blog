@@ -7,3 +7,8 @@ type CategoryResponse struct {
 	Slug     string             `json:"slug"`
 	Child    []CategoryResponse `json:"child"`
 }
+
+type CreateCategoryRequest struct {
+	ParentID string `json:"parent_id"`
+	Title    string `json:"title"`
+}
