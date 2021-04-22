@@ -22,8 +22,9 @@ func NewPostController(postService *service.PostService) PostController {
 func (controller *PostController) Route(app fiber.Router) {
 	postRoute := app.Group("/post")
 
-	postRoute.Get("/list", controller.ListPost)
-	postRoute.Get("/list/:slug", controller.PostBySlug)
+	postRoute.Get("/", controller.ListPost)
+	postRoute.Get("/:slug", controller.PostBySlug)
+	postRoute.Get("/topic/:slug", controller.ListByCategory)
 	postRoute.Post("/", controller.CreatePost)
 	postRoute.Put("/:id", controller.UpdatePost)
 	postRoute.Delete(":id", controller.DeletePost)
@@ -45,6 +46,18 @@ func (controller *PostController) ListPost(c *fiber.Ctx) error {
 	}
 
 	response := controller.PostService.ListPost(payload)
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
+}
+
+func (controller *PostController) ListByCategory(c *fiber.Ctx) error {
+	slug := c.Params("slug")
+
+	request := model.ListPostByCategoryRequest{
+		Slug: slug,
+	}
+
+	response := controller.PostService.ListPostByCategory(request)
 
 	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
 }

@@ -7,6 +7,10 @@ type ListPostRequest struct {
 	Q      string `json:"q"`
 }
 
+type ListPostByCategoryRequest struct {
+	Slug string
+}
+
 type ListPostResponse struct {
 	ID         uint   `json:"id"`
 	AuthorName string `gorm:"column:user_name" json:"author_name"`

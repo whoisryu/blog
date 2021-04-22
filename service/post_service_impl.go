@@ -98,3 +98,9 @@ func (service postServiceImpl) DeletePost(ID string) {
 
 	service.postRepository.DeletePost(uint(id))
 }
+
+func (service postServiceImpl) ListPostByCategory(req model.ListPostByCategoryRequest) (response []model.ListPostResponse) {
+	response = service.postRepository.ListByCategory(req)
+
+	return response
+}

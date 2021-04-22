@@ -7,6 +7,7 @@ import (
 
 type PostRepo interface {
 	ListPost(req model.ListPostRequest) (response []model.ListPostResponse)
+	ListByCategory(req model.ListPostByCategoryRequest) (response []model.ListPostResponse)
 	PostBySlug(slug string) (response model.ListPostResponse)
 	PostByID(ID uint) (post entity.Post)
 	CreatePost(post entity.Post) entity.Post

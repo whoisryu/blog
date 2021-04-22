@@ -69,3 +69,11 @@ func (repo postRepoImpl) DeletePost(ID uint) {
 	err := repo.db.Where("id = ?", ID).Delete(&entity.Post{}).Error
 	exception.PanicIfNeeded(err)
 }
+
+func (repo postRepoImpl) ListByCategory(req model.ListPostByCategoryRequest) (response []model.ListPostResponse) {
+	err := repo.db.Table("post").Joins("JOIN post_category ON post_category.post_id=post.id").Joins("JOIN category ON category.id=post_category.category_id").Joins("JOIN user on user.id=post.author_id").Where("category.slug=?", req.Slug).Select("post.id, user.user_name, post.title, post.slug, post.content").Find(&response).Error
+
+	exception.PanicIfNeeded(err)
+
+	return response
+}
