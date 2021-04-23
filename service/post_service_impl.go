@@ -5,6 +5,7 @@ import (
 	"blog/exception"
 	"blog/model"
 	"blog/repository"
+	"blog/validation"
 	"strconv"
 	"strings"
 	"time"
@@ -31,6 +32,7 @@ func (service postServiceImpl) PostBySlug(slug string) (response model.ListPostR
 }
 
 func (service postServiceImpl) CreatePost(req model.CreatePostRequest) entity.Post {
+	validation.ValidatePost(req)
 	slug := strings.ReplaceAll(strings.ToLower(req.Title), " ", "-")
 
 	categories := []entity.Category{}
@@ -59,6 +61,7 @@ func (service postServiceImpl) CreatePost(req model.CreatePostRequest) entity.Po
 }
 
 func (service postServiceImpl) UpdatePost(req model.UpdatePostRequest) entity.Post {
+	validation.ValidateUpdatePost(req)
 	id, _ := strconv.Atoi(req.ID)
 	slug := strings.ReplaceAll(strings.ToLower(req.Title), " ", "-")
 

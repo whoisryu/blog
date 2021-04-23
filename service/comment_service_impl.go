@@ -5,6 +5,7 @@ import (
 	"blog/exception"
 	"blog/model"
 	"blog/repository"
+	"blog/validation"
 	"strconv"
 	"time"
 )
@@ -18,6 +19,7 @@ func NewCommentService(repo *repository.CommentRepo) CommentService {
 }
 
 func (service commentServiceImpl) CreateComment(req model.CommentRequest) (comment entity.Comment) {
+	validation.ValidateComment(req)
 	postID, err := strconv.Atoi(req.PostID)
 	exception.PanicIfNeeded(err)
 

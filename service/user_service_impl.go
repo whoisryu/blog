@@ -6,6 +6,7 @@ import (
 	"blog/helper"
 	"blog/model"
 	"blog/repository"
+	"blog/validation"
 	"errors"
 	"strconv"
 	"time"
@@ -20,6 +21,7 @@ func NewUserService(userRepo *repository.UserRepo) UserService {
 }
 
 func (service userServiceImpl) RegisterUser(req model.RegisterUserRequest) (*model.TokenResponse, error) {
+	validation.ValidateRegisterUser(req)
 
 	checkUser := service.UserRepo.GetUserByPhone(req.Phone)
 	if checkUser.ID != 0 {
@@ -66,6 +68,7 @@ func (service userServiceImpl) RegisterUser(req model.RegisterUserRequest) (*mod
 }
 
 func (service userServiceImpl) Login(req model.LoginRequest) (*model.TokenResponse, error) {
+	validation.ValidateLoginUser(req)
 	user := service.UserRepo.GetUserByEmail(req.Email)
 
 	if user.ID == 0 {
@@ -102,6 +105,7 @@ func (service userServiceImpl) Login(req model.LoginRequest) (*model.TokenRespon
 }
 
 func (service userServiceImpl) UpdateProfile(req model.UpdateProfileRequest) (entity.User, error) {
+	validation.ValidateUpdate(req)
 	userID, err := strconv.Atoi(req.ID)
 	exception.PanicIfNeeded(err)
 
