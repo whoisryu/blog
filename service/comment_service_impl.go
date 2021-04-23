@@ -43,6 +43,7 @@ func buildComment(ids []model.ListCommentResponse, relations map[uint][]model.Li
 	comments := make([]model.ListCommentResponse, len(ids))
 	for i, comment := range ids {
 		c := model.ListCommentResponse{
+			ID:        comment.ID,
 			PostID:    comment.PostID,
 			ParentID:  comment.ParentID,
 			Content:   comment.Content,

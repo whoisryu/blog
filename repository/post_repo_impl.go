@@ -36,7 +36,7 @@ func (repo postRepoImpl) ListPost(req model.ListPostRequest) (response []model.L
 }
 
 func (repo postRepoImpl) PostBySlug(slug string) (response model.ListPostResponse) {
-	err := repo.db.Table("post p").Select("p.id, p.title, p.slug, p.content, u.user_name, u.id").Joins("JOIN user u on u.id=p.author_id").Where("p.is_published=1").Find(&response).Error
+	err := repo.db.Table("post p").Select("p.id, p.title, p.slug, p.content, u.user_name, u.id").Joins("JOIN user u on u.id=p.author_id").Where("p.is_published=1 and p.slug=?", slug).Find(&response).Error
 
 	exception.PanicIfNeeded(err)
 
@@ -66,8 +66,16 @@ func (repo postRepoImpl) UpdatePost(post entity.Post) entity.Post {
 }
 
 func (repo postRepoImpl) DeletePost(ID uint) {
-	err := repo.db.Where("id = ?", ID).Delete(&entity.Post{}).Error
-	exception.PanicIfNeeded(err)
+	err := repo.db.Where("post_id=?", ID).Delete(&entity.PostCategory{}).Error
+
+	if err == nil {
+		err = repo.db.Where("post_id=?", ID).Delete(&entity.Comment{}).Error
+		if err == nil {
+			err = repo.db.Where("id = ?", ID).Delete(&entity.Post{}).Error
+			exception.PanicIfNeeded(err)
+		}
+	}
+
 }
 
 func (repo postRepoImpl) ListByCategory(req model.ListPostByCategoryRequest) (response []model.ListPostResponse) {
