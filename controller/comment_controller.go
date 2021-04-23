@@ -3,6 +3,7 @@ package controller
 import (
 	"blog/exception"
 	"blog/helper"
+	"blog/middleware"
 	"blog/model"
 	"blog/service"
 
@@ -20,8 +21,8 @@ func NewCommentController(commentService *service.CommentService) CommentControl
 func (controller CommentController) Route(app fiber.Router) {
 	commentRouter := app.Group("/comment")
 
-	commentRouter.Get("/:id", controller.ListComment)
-	commentRouter.Post("/:id", controller.CreateComment)
+	commentRouter.Get("/:id", middleware.TokenAuth(), controller.ListComment)
+	commentRouter.Post("/:id", middleware.TokenAuth(), controller.CreateComment)
 }
 
 func (controller CommentController) ListComment(c *fiber.Ctx) error {

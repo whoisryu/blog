@@ -14,4 +14,5 @@ type PostRepo interface {
 	UpdatePost(post entity.Post) entity.Post
 	DeletePost(ID uint)
 	UpdateViews(slug string)
+	ListMyPost(req model.ListPostRequestMine) (response []model.ListPostResponse)
 }

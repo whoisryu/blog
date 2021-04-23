@@ -3,6 +3,7 @@ package controller
 import (
 	"blog/exception"
 	"blog/helper"
+	"blog/middleware"
 	"blog/model"
 	"blog/service"
 	"net/http"
@@ -23,11 +24,12 @@ func (controller *PostController) Route(app fiber.Router) {
 	postRoute := app.Group("/post")
 
 	postRoute.Get("/", controller.ListPost)
+	postRoute.Get("/mine", middleware.TokenAuth(), controller.ListPostUser)
 	postRoute.Get("/:slug", controller.PostBySlug)
 	postRoute.Get("/topic/:slug", controller.ListByCategory)
-	postRoute.Post("/", controller.CreatePost)
-	postRoute.Put("/:id", controller.UpdatePost)
-	postRoute.Delete(":id", controller.DeletePost)
+	postRoute.Post("/", middleware.TokenAuth(), controller.CreatePost)
+	postRoute.Put("/:id", middleware.TokenAuth(), controller.UpdatePost)
+	postRoute.Delete(":id", middleware.TokenAuth(), controller.DeletePost)
 }
 
 func (controller *PostController) ListPost(c *fiber.Ctx) error {
@@ -46,6 +48,32 @@ func (controller *PostController) ListPost(c *fiber.Ctx) error {
 	}
 
 	response := controller.PostService.ListPost(payload)
+
+	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
+}
+
+func (controller *PostController) ListPostUser(c *fiber.Ctx) error {
+	au, _ := helper.ExtractTokenMetadata(c)
+
+	getUserId := au.UserId
+
+	userId := strconv.Itoa(int(getUserId))
+	q := c.Query("q")
+	getSort := c.Query("sort")
+
+	sort, err := strconv.Atoi(getSort)
+
+	if err != nil {
+		sort = 0
+	}
+
+	payload := model.ListPostRequestMine{
+		SortBy: uint(sort),
+		Q:      q,
+		UserID: userId,
+	}
+
+	response := controller.PostService.ListPostUser(payload)
 
 	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(response))
 }

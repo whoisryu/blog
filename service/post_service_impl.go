@@ -25,6 +25,12 @@ func (service postServiceImpl) ListPost(req model.ListPostRequest) (response []m
 	return response
 }
 
+func (service postServiceImpl) ListPostUser(req model.ListPostRequestMine) (response []model.ListPostResponse) {
+	response = service.postRepository.ListMyPost(req)
+
+	return response
+}
+
 func (service postServiceImpl) PostBySlug(req model.PostBySlug) (response model.ListPostResponse) {
 
 	response = service.postRepository.PostBySlug(req.Slug)

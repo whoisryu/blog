@@ -7,6 +7,12 @@ type ListPostRequest struct {
 	Q      string `json:"q"`
 }
 
+type ListPostRequestMine struct {
+	UserID string
+	SortBy uint   `json:"sort_by"` // 0 terbaru 1 terpopuler
+	Q      string `json:"q"`
+}
+
 type ListPostByCategoryRequest struct {
 	Slug string
 }
