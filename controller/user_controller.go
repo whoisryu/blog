@@ -36,7 +36,7 @@ func (controller *UserController) RegisterUser(c *fiber.Ctx) error {
 	user := new(model.RegisterUserRequest)
 
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
+		exception.PanicIfNeeded(err)
 	}
 
 	newUser, err := controller.UserService.RegisterUser(*user)
@@ -61,7 +61,7 @@ func (controller UserController) UpdateProfile(c *fiber.Ctx) error {
 	user := new(model.UpdateProfileRequest)
 	user.ID = userID
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
+		exception.PanicIfNeeded(err)
 	}
 
 	newUser, err := controller.UserService.UpdateProfile(*user)
@@ -81,7 +81,7 @@ func (controller UserController) Login(c *fiber.Ctx) error {
 	user := new(model.LoginRequest)
 
 	if err := c.BodyParser(&user); err != nil {
-		return c.Status(http.StatusInternalServerError).JSON(helper.ResponseInternalError(err))
+		exception.PanicIfNeeded(err)
 	}
 	token, err := controller.UserService.Login(*user)
 	if err != nil && err.Error() == "404" {

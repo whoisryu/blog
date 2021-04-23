@@ -36,7 +36,7 @@ func (repo postRepoImpl) ListPost(req model.ListPostRequest) (response []model.L
 }
 
 func (repo postRepoImpl) PostBySlug(slug string) (response model.ListPostResponse) {
-	err := repo.db.Table("post p").Select("p.id, p.title, p.slug, p.content, u.user_name").Joins("JOIN user u on u.id=p.author_id").Where("p.is_published=1").Find(&response).Error
+	err := repo.db.Table("post p").Select("p.id, p.title, p.slug, p.content, u.user_name, u.id").Joins("JOIN user u on u.id=p.author_id").Where("p.is_published=1").Find(&response).Error
 
 	exception.PanicIfNeeded(err)
 
@@ -76,4 +76,9 @@ func (repo postRepoImpl) ListByCategory(req model.ListPostByCategoryRequest) (re
 	exception.PanicIfNeeded(err)
 
 	return response
+}
+
+func (repo postRepoImpl) UpdateViews(slug string) {
+	err := repo.db.Exec("UPDATE post SET views = views + 1 WHERE slug = ?", slug).Error
+	exception.PanicIfNeeded(err)
 }

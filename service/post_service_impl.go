@@ -25,8 +25,13 @@ func (service postServiceImpl) ListPost(req model.ListPostRequest) (response []m
 	return response
 }
 
-func (service postServiceImpl) PostBySlug(slug string) (response model.ListPostResponse) {
-	response = service.postRepository.PostBySlug(slug)
+func (service postServiceImpl) PostBySlug(req model.PostBySlug) (response model.ListPostResponse) {
+
+	response = service.postRepository.PostBySlug(req.Slug)
+
+	if req.UserID != "" && req.UserID != response.AuthorID {
+		service.postRepository.UpdateViews(req.Slug)
+	}
 
 	return response
 }

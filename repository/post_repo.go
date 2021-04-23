@@ -13,4 +13,5 @@ type PostRepo interface {
 	CreatePost(post entity.Post) entity.Post
 	UpdatePost(post entity.Post) entity.Post
 	DeletePost(ID uint)
+	UpdateViews(slug string)
 }

@@ -64,8 +64,21 @@ func (controller *PostController) ListByCategory(c *fiber.Ctx) error {
 
 func (controller *PostController) PostBySlug(c *fiber.Ctx) error {
 	slug := c.Params("slug")
+	au, _ := helper.ExtractTokenMetadata(c)
 
-	response := controller.PostService.PostBySlug(slug)
+	var userID = ""
+
+	if au != nil {
+		userID = strconv.Itoa(int(au.UserId))
+
+	}
+
+	request := model.PostBySlug{
+		Slug:   slug,
+		UserID: userID,
+	}
+
+	response := controller.PostService.PostBySlug(request)
 
 	if response.ID == 0 {
 		return c.Status(http.StatusNotFound).JSON(helper.ResponseNotFound())

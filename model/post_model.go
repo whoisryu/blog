@@ -11,8 +11,14 @@ type ListPostByCategoryRequest struct {
 	Slug string
 }
 
+type PostBySlug struct {
+	Slug   string
+	UserID string
+}
+
 type ListPostResponse struct {
 	ID         uint   `json:"id"`
+	AuthorID   string `json:"-"`
 	AuthorName string `gorm:"column:user_name" json:"author_name"`
 	Title      string `json:"title"`
 	Slug       string `json:"slug"`
