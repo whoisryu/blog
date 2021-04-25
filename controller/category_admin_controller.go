@@ -31,5 +31,5 @@ func (controller CategoryAdminController) CreateCategory(c *fiber.Ctx) error {
 
 	newCategory := controller.CategoryAdminService.CreateCategory(*category)
 
-	return c.Status(200).JSON(newCategory)
+	return c.Status(201).JSON(newCategory)
 }

@@ -74,7 +74,7 @@ func (controller UserController) UpdateProfile(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(helper.ResponseBadRequest(map[string]interface{}{"email": "REGISTERED"}))
 	}
 
-	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(newUser))
+	return c.Status(201).JSON(helper.ResponseSuccess(newUser))
 }
 
 func (controller UserController) Login(c *fiber.Ctx) error {

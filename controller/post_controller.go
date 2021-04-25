@@ -130,7 +130,7 @@ func (controller *PostController) CreatePost(c *fiber.Ctx) error {
 
 	newPost := controller.PostService.CreatePost(*post)
 
-	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(newPost))
+	return c.Status(201).JSON(helper.ResponseSuccess(newPost))
 }
 
 func (controller *PostController) UpdatePost(c *fiber.Ctx) error {
@@ -146,7 +146,7 @@ func (controller *PostController) UpdatePost(c *fiber.Ctx) error {
 
 	updatedPost := controller.PostService.UpdatePost(*post)
 
-	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(updatedPost))
+	return c.Status(201).JSON(helper.ResponseSuccess(updatedPost))
 }
 
 func (controller *PostController) DeletePost(c *fiber.Ctx) error {
@@ -154,5 +154,5 @@ func (controller *PostController) DeletePost(c *fiber.Ctx) error {
 
 	controller.PostService.DeletePost(id)
 
-	return c.Status(http.StatusOK).JSON(helper.ResponseSuccess(struct{}{}))
+	return c.Status(201).JSON(helper.ResponseSuccess(struct{}{}))
 }

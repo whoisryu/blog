@@ -34,7 +34,7 @@ func (controller CommentController) ListComment(c *fiber.Ctx) error {
 
 	response := controller.service.ListComment(payload)
 
-	return c.Status(200).JSON(helper.ResponseSuccess(response))
+	return c.Status(201).JSON(helper.ResponseSuccess(response))
 }
 
 func (controller CommentController) CreateComment(c *fiber.Ctx) error {
@@ -53,6 +53,6 @@ func (controller CommentController) CreateComment(c *fiber.Ctx) error {
 
 	response := controller.service.CreateComment(*comment)
 
-	return c.Status(200).JSON(helper.ResponseSuccess(response))
+	return c.Status(201).JSON(helper.ResponseSuccess(response))
 
 }

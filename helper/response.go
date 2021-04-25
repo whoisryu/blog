@@ -7,7 +7,7 @@ import (
 
 func ResponseSuccess(data interface{}) model.Response {
 	response := model.Response{
-		Code:   200,
+		Code:   201,
 		Status: "OK",
 		Data:   data,
 		Error:  struct{}{},
